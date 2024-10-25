@@ -8,7 +8,7 @@ export const generateRiddle = async (difficulty: string, sdg: number) => {
   const prompt = `Generate a ${difficulty} sustainability-themed riddle related to SDG ${sdg} with the following format:
   {
     "question": "The riddle question",
-    "answer": "The one-word answer to the riddle",
+    "answer": "A one or two-word answer to the riddle (randomly choose between single or double word)",
     "fact": "An interesting fact related to the answer and sustainability",
     "didYouKnow": "A surprising 'Did you know?' fact that would make people say 'What?!' and want to share it",
     "importance": "A brief explanation of why this topic is important for sustainability",
@@ -17,9 +17,55 @@ export const generateRiddle = async (difficulty: string, sdg: number) => {
     "difficulty": "${difficulty}"
   }
 
-  Ensure that the riddle is primarily focused on SDG ${sdg}, but also consider including up to two related SDGs if relevant. The "sdgs" array should always include the main SDG (${sdg}) as the first element, followed by any related SDGs.
+  Critical Instructions for Answer Generation:
+  1. ALTERNATE between one-word and two-word answers (approximately 50/50 split)
+  2. Keep answers guessable while still being specific
+  3. Avoid technical jargon or complex terminology
+  4. Use common terms that relate to specific solutions or actions
 
-  Make the riddle engaging, educational, and appropriate for the specified difficulty level. The answer should be a single word that captures the essence of the sustainability concept related to the SDG.`;
+  Examples:
+  For SDG 1 (No Poverty):
+    BAD answers: "poverty", "community-based natural resource management", "economic empowerment initiative"
+    GOOD one-word answers: "microloan", "cooperative", "training"
+    GOOD two-word answers: "skill center", "fair trade", "savings group"
+
+  For SDG 6 (Clean Water):
+    BAD answers: "water", "sanitation", "integrated water resources management"
+    GOOD one-word answers: "filtration", "watershed", "purifier"
+    GOOD two-word answers: "rain barrel", "drip system", "water tank"
+
+  For SDG 13 (Climate Action):
+    BAD answers: "climate", "action", "greenhouse gas emission reduction strategy"
+    GOOD one-word answers: "composting", "reforestation", "insulation"
+    GOOD two-word answers: "solar panel", "carbon sink", "green roof"
+
+  For SDG 17 (Partnerships):
+    BAD answers: "partnership", "collaboration", "international development cooperation"
+    GOOD one-word answers: "blockchain", "crowdfunding", "networking"
+    GOOD two-word answers: "data sharing", "tech transfer", "joint venture"
+
+  Difficulty Guidelines:
+  Easy: 
+    - One word: "recycling", "compost", "windmill"
+    - Two words: "food bank", "bike path", "solar light"
+  
+  Medium:
+    - One word: "aquaponics", "biochar", "greenhouse"
+    - Two words: "smart grid", "seed bank", "waste sorting"
+  
+  Hard:
+    - One word: "desalination", "permaculture", "biodiesel"
+    - Two words: "carbon sink", "micro grid", "thermal storage"
+
+  The riddle should:
+  1. Focus on specific, actionable solutions
+  2. Use clear, understandable language
+  3. Have answers that could reasonably be guessed
+  4. Teach about practical approaches
+  5. Remain engaging and challenging without being impossible
+  6. NEVER use the SDG name or basic concepts directly from the SDG description as answers
+
+  Make the riddle engaging and educational while ensuring the answer is either one or two words (randomly chosen).`;
 
   const result = await model.generateContent(prompt);
   const response = await result.response;
