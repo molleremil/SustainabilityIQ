@@ -5,7 +5,14 @@ import { db } from "../firebase";
 import { generateRiddle } from "../services/geminiService";
 import { Loader2 } from "lucide-react";
 
-const sdgInfo = {
+interface SDGInfo {
+  [key: number]: {
+    name: string;
+    description: string;
+  }
+}
+
+const sdgInfo: SDGInfo = {
   1: { name: "No Poverty", description: "End poverty in all its forms everywhere" },
   2: { name: "Zero Hunger", description: "End hunger, achieve food security and improved nutrition" },
   3: { name: "Good Health and Well-being", description: "Ensure healthy lives and promote well-being for all" },
@@ -40,6 +47,13 @@ interface Rank {
   name: string;
   minPoints: number;
   color: string;
+}
+
+interface UpdateData {
+  [key: string]: any;
+  totalPoints: any;
+  riddlesSolved: any;
+  riddlesSolvedWithoutHint: any;
 }
 
 const ranks: Rank[] = [
@@ -175,7 +189,7 @@ const RiddleGame: React.FC = () => {
     setNextRank(next);
   };
 
-  const getDifficultyLevel = () => {
+  const getDifficultyLevel = (): string => {
     if (totalPoints < 50) return "easy";
     if (totalPoints < 200) return "medium";
     return "hard";
@@ -211,7 +225,7 @@ const RiddleGame: React.FC = () => {
       setTotalPoints(newTotalPoints);
       updateRank(newTotalPoints);
 
-      const updateData: { [key: string]: any } = {
+      const updateData: UpdateData = {
         totalPoints: increment(points),
         riddlesSolved: increment(1),
         riddlesSolvedWithoutHint: solvedWithoutHint ? increment(1) : increment(0),
@@ -280,13 +294,19 @@ const RiddleGame: React.FC = () => {
               {nextRank ? `Next rank: ${nextRank.name}` : "Max rank achieved!"}
             </p>
           </div>
-          <div className="w-16 h-16 rounded-full flex items-center justify-center text-white text-xl font-bold" style={{ backgroundColor: currentRank.color }}>
+          <div 
+            className="w-16 h-16 rounded-full flex items-center justify-center text-white text-xl font-bold" 
+            style={{ backgroundColor: currentRank.color }}
+          >
             {totalPoints}
           </div>
         </div>
         {nextRank && (
           <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
-            <div className="bg-green-600 h-2.5 rounded-full" style={{ width: `${progressToNextRank}%` }}></div>
+            <div 
+              className="bg-green-600 h-2.5 rounded-full" 
+              style={{ width: `${progressToNextRank}%` }}
+            ></div>
           </div>
         )}
       </div>
@@ -305,8 +325,12 @@ const RiddleGame: React.FC = () => {
                 alt={`SDG ${selectedSDG}`}
                 className="w-24 h-24 mb-2"
               />
-              <p className="text-sm text-center font-semibold">{sdgInfo[selectedSDG].name}</p>
-              <p className="text-xs text-center text-gray-600">{sdgInfo[selectedSDG].description}</p>
+              <p className="text-sm text-center font-semibold">
+                {sdgInfo[selectedSDG as keyof typeof sdgInfo].name}
+              </p>
+              <p className="text-xs text-center text-gray-600">
+                {sdgInfo[selectedSDG as keyof typeof sdgInfo].description}
+              </p>
             </div>
           )}
           <p className="text-lg mb-4">{riddle.question}</p>
@@ -340,24 +364,24 @@ const RiddleGame: React.FC = () => {
                   {showHint ? "Hint Used" : "Show Hint"}
                 </button>
               </div>
-              </>
-              )}
-              {showHint && !showAnswer && (
-              <p className="mt-4 text-yellow-600">Hint: {riddle.hint}</p>
-              )}
-              </div>
-              )}
-              {showAnswer && riddle && (
-              <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4">
-              <p className="font-bold mb-2">Answer: {riddle.answer}</p>
-              <p className="font-bold mt-4 mb-2">Did you know?</p>
-              <p className="mb-4">{riddle.didYouKnow}</p>
-              <p className="font-bold mb-2">Interesting Fact:</p>
-              <p className="mb-4">{riddle.fact}</p>
-              <p className="font-bold mb-2">Why is this important?</p>
-              <p className="mb-4">{riddle.importance}</p>
-              {relatedSDGs.length > 0 && (
-              <div className="mt-4">
+            </>
+          )}
+          {showHint && !showAnswer && (
+            <p className="mt-4 text-yellow-600">Hint: {riddle.hint}</p>
+          )}
+        </div>
+      )}
+      {showAnswer && riddle && (
+        <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4">
+          <p className="font-bold mb-2">Answer: {riddle.answer}</p>
+          <p className="font-bold mt-4 mb-2">Did you know?</p>
+          <p className="mb-4">{riddle.didYouKnow}</p>
+          <p className="font-bold mb-2">Interesting Fact:</p>
+          <p className="mb-4">{riddle.fact}</p>
+          <p className="font-bold mb-2">Why is this important?</p>
+          <p className="mb-4">{riddle.importance}</p>
+          {relatedSDGs.length > 0 && (
+            <div className="mt-4">
               <p className="font-bold mb-2">Related SDGs:</p>
               <div className="flex flex-wrap gap-2">
                 {relatedSDGs.map(sdg => (
@@ -367,24 +391,26 @@ const RiddleGame: React.FC = () => {
                       alt={`SDG ${sdg}`}
                       className="w-12 h-12 mb-1"
                     />
-                    <p className="text-xs text-center">{sdgInfo[sdg].name}</p>
+                    <p className="text-xs text-center">
+                      {sdgInfo[sdg as keyof typeof sdgInfo].name}
+                    </p>
                   </div>
                 ))}
               </div>
-              </div>
-              )}
-              </div>
-              )}
-              {riddleCompleted && (
-              <button
-              onClick={handleNextRiddle}
-              className="bg-blue-500 text-white px-4 py-2 rounded w-full mt-4"
-              >
-              Next Riddle
-              </button>
-              )}
-              </div>
-              );
-              };
+            </div>
+          )}
+        </div>
+      )}
+      {riddleCompleted && (
+        <button
+          onClick={handleNextRiddle}
+          className="bg-blue-500 text-white px-4 py-2 rounded w-full mt-4"
+        >
+          Next Riddle
+        </button>
+      )}
+    </div>
+  );
+};
 
-              export default RiddleGame;
+export default RiddleGame;
